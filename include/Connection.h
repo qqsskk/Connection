@@ -23,8 +23,8 @@ public:
 	const char *GetIP(void);
 	int GetPort(void);
 	int GetSockfd(void);
-    void SendData(char *data, int n) throw(ConnectionException&);
-    void RecvData(char *buffer, int n) throw(ConnectionException&);
+    void SendData(void *data, int n) throw(ConnectionException&);
+    void RecvData(void *buffer, int n) throw(ConnectionException&);
 	//server use
 	void BindIpPort(const char *ipStr, int port) throw(ConnectionException&);
 	void ListenForClient(int backlog) throw(ConnectionException&);

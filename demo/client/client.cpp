@@ -4,7 +4,8 @@
 # mail: rsqmail@163.com
 	> Created Time: 2013年04月06日 星期六 01时00分06秒
  ************************************************************************/
-#include "Connection.h"
+#include <Connection.h>
+#include <Protocal.h>
 #include <iostream>
 #include <stdlib.h> //exit
 #include <unistd.h>
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
 	ConnectionIPV4 conn;
     char msgStr[100];
     int n;
+	struct ProtocalHead head;
 
 	if(argc<2){
 		cout << "Usage: client <IpAddress>\n";
@@ -26,8 +28,13 @@ int main(int argc, char **argv)
 		conn.InitialSocket();
 		while(conn.ConnectToServer(argv[1],SERV_PORT) == false) sleep(3);
         cout << "Connect ok" <<endl;
-        conn.RecvData(msgStr, 100);
-        //msgStr[1dd2] = 0;
+
+	//receive head
+	conn.RecvData(&head, sizeof(head));
+	//receive data
+        conn.RecvData(msgStr, head.dataLen);
+        msgStr[head.dataLen] = 0;
+
         cout << "Received msg: " << msgStr << endl;
 		while(1) sleep(10);
 	}catch(const ConnectionException &e){

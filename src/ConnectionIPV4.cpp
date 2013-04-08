@@ -46,12 +46,13 @@ int ConnectionIPV4::GetSockfd(void)
 }
 //----------------------------------------------------------------
 //可适应阻塞和非阻塞式的读写
-void ConnectionIPV4::SendData(char *data, int n) throw(ConnectionException&)
+void ConnectionIPV4::SendData(void *data, int n) throw(ConnectionException&)
 {
     int sendNum = 0, sendBytes;
-
+	char *buffer = static_cast<char *>(data);
+	
     while(n-sendNum > 0){
-        sendBytes = write(mSockfd, data+sendNum, n-sendNum);
+        sendBytes = write(mSockfd, buffer+sendNum, n-sendNum);
         if(sendBytes <= 0){
             if(EINTR == errno || EAGAIN == errno) sendBytes = 0;/*continue send*/
             else if(EPIPE == errno || ECONNRESET == errno || ECONNREFUSED == errno)
@@ -64,10 +65,11 @@ void ConnectionIPV4::SendData(char *data, int n) throw(ConnectionException&)
     return;
 }
 //----------------------------------------------------------------
-void ConnectionIPV4::RecvData(char *buffer, int n) throw(ConnectionException&)
+void ConnectionIPV4::RecvData(void *data, int n) throw(ConnectionException&)
 {
     int recvNum = 0, recvBytes;
-
+	char *buffer = static_cast<char*>(data);
+	
     while(n-recvNum > 0){
         recvBytes = read(mSockfd, buffer+recvNum, n-recvNum);
         if(0 == recvBytes) throw ConnectionException("Error: recv data failure, counterpart closed\n");/*received FIN*/
