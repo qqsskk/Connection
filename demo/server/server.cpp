@@ -14,7 +14,7 @@ using namespace std;
 int main()
 {
 	ConnectionIPV4 connListen, connCli;
-
+    char msgStr[100] = "hello, client";
 	try{
 		connListen.InitialSocket();
 		connListen.BindIpPort(NULL, LISTEN_PORT);
@@ -22,7 +22,11 @@ int main()
 		cout << "Listen ...\n";
 		while(connListen.AcceptClient(connCli)){
 			cout <<"Client " <<  connCli.GetIP() << " on port " << connCli.GetPort() << " is connected to fd " << connCli.GetSockfd() << endl;
+            break;
 		}
+        cout << "Send Msg: " << msgStr << endl;
+        connCli.SendData(msgStr, 100);
+        cout << "Send ok" << endl;
 		while(1) sleep(10);
 	}catch(const ConnectionException &e){
 		cout << e.what();

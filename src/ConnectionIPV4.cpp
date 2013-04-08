@@ -45,6 +45,45 @@ int ConnectionIPV4::GetSockfd(void)
 	return mSockfd;
 }
 //----------------------------------------------------------------
+//可适应阻塞和非阻塞式的读写
+void ConnectionIPV4::SendData(char *data, int n) throw(ConnectionException&)
+{
+    int sendNum = 0, sendBytes;
+
+    while(n-sendNum > 0){
+        sendBytes = write(mSockfd, data+sendNum, n-sendNum);
+        if(sendBytes <= 0){
+            if(EINTR == errno || EAGAIN == errno) sendBytes = 0;/*continue send*/
+            else if(EPIPE == errno || ECONNRESET == errno || ECONNREFUSED == errno)
+                throw ConnectionException("Error: send data failure, connection unavailable\n");
+            else
+                throw ConnectionException("Error: send data failure, unknown reason\n");
+        }
+        sendNum += sendBytes;
+    }
+    return;
+}
+//----------------------------------------------------------------
+void ConnectionIPV4::RecvData(char *buffer, int n) throw(ConnectionException&)
+{
+    int recvNum = 0, recvBytes;
+
+    while(n-recvNum > 0){
+        recvBytes = read(mSockfd, buffer+recvNum, n-recvNum);
+        if(0 == recvBytes) throw ConnectionException("Error: recv data failure, counterpart closed\n");/*received FIN*/
+        else if(recvBytes < 0){
+            if(EINTR == errno || EAGAIN == errno) recvBytes = 0;/*continue receive data*/
+            else if(ETIMEDOUT == errno || ECONNRESET == errno || ECONNREFUSED == errno)
+                throw ConnectionException("Error: recv data failure, counterpart closed\n");
+            else if(EHOSTUNREACH == errno || ENETUNREACH == errno)
+                throw ConnectionException("Error: recv data failure, net unreachable\n");
+            else 
+                throw ConnectionException("Error: recv data failure, unknown reason\n");
+        }
+        recvNum += recvBytes;
+    }
+}
+//----------------------------------------------------------------
 void ConnectionIPV4::InitialSocket(void) throw(ConnectionException&)
 {
 	mSockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
