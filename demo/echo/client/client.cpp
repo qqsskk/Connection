@@ -6,19 +6,21 @@
  ************************************************************************/
 #include <Connection.h>
 #include <Protocal.h>
-#include <iostream>
 #include <stdlib.h> //exit
 #include <unistd.h>
+#include <string.h>
+#include <stdio.h>
+#include <iostream>
 
 using namespace std;
 #define SERV_PORT 8000
-
+#define BUFFER_SIZE 1024
 int main(int argc, char **argv)
 {
 	ConnectionIPV4 conn;
-    char msgStr[100];
-    int n;
+	char msgStr[BUFFER_SIZE];
 	struct ProtocalHead head;
+	int n;
 
 	if(argc<2){
 		cout << "Usage: client <IpAddress>\n";
@@ -27,16 +29,27 @@ int main(int argc, char **argv)
 	try{
 		conn.InitialSocket();
 		while(conn.ConnectToServer(argv[1],SERV_PORT) == false) sleep(3);
-        cout << "Connect ok" <<endl;
+        	cout << "Connect ok" <<endl;
 
-	//receive head
-	conn.RecvData(&head, sizeof(head));
-	//receive data
-        conn.RecvData(msgStr, head.dataLen);
-        msgStr[head.dataLen] = 0;
+		while(fgets(msgStr, BUFFER_SIZE, stdin)){
+			n = strlen(msgStr);
+			--n;
+			if(n>1){
+				msgStr[n] = 0;
+				head.dataLen = n;
+				
+				//send head
+				conn.SendData(&head,sizeof(head));
+				//recv head
+				conn.SendData(msgStr, n);
+				
+				//receive data
+			        conn.RecvData(msgStr, n);
+			        msgStr[n] = 0;
 
-        cout << "Received msg: " << msgStr << endl;
-		while(1) sleep(10);
+			        cout << "Received msg: " << msgStr << endl;
+			}
+		}
 	}catch(const ConnectionException &e){
 		cout << e.what();
 	}

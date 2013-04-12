@@ -16,8 +16,8 @@ using namespace std;
 int main()
 {
 	ConnectionIPV4 connListen, connCli;
-    char msgStr[100] = "hello, client";
-    struct ProtocalHead head;
+	char msgStr[100] = "hello, client";
+	struct ProtocalHead head;
 	try{
 		connListen.InitialSocket();
 		connListen.BindIpPort(NULL, LISTEN_PORT);
@@ -25,17 +25,16 @@ int main()
 		cout << "Listen ...\n";
 		while(connListen.AcceptClient(connCli)){
 			cout <<"Client " <<  connCli.GetIP() << " on port " << connCli.GetPort() << " is connected to fd " << connCli.GetSockfd() << endl;
-            break;
+	        break;
 		}
-	//send head
-        head.dataLen = strlen(msgStr) + 1;
-        connCli.SendData(&head, sizeof(head));
-	//send msg
-        cout << "Send Msg: " << msgStr << endl;
-        connCli.SendData(msgStr, 100);
-        cout << "Send ok" << endl;
-	
-	while(1) sleep(10);
+
+		while(1){
+			connCli.RecvData(&head,sizeof(head));
+			connCli.RecvData(msgStr, head.dataLen);
+			msgStr[head.dataLen]=0;
+			connCli.SendData(msgStr, head.dataLen);
+			cout << "Received "<< msgStr << "\nEcho back ...\n";
+		}
 	}catch(const ConnectionException &e){
 		cout << e.what();
 	}

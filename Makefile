@@ -1,5 +1,5 @@
 MAKE := make
-SUBDIR := src demo/server demo/client
+SUBDIR := src demo/echo/server demo/echo/client
 
 all: $(SUBDIR)
 	@for sdir in ${SUBDIR}; do (cd $$sdir && $(MAKE)) || exit 1; done
