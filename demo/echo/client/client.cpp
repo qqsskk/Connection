@@ -28,7 +28,10 @@ int main(int argc, char **argv)
 	}
 	try{
 		conn.InitialSocket();
-		while(conn.ConnectToServer(argv[1],SERV_PORT) == false) sleep(3);
+		while(conn.ConnectToServer(argv[1],SERV_PORT) == false) {
+			cout << conn.GetLastError() << endl;
+			sleep(3);
+		}
         	cout << "Connect ok" <<endl;
 
 		while(fgets(msgStr, BUFFER_SIZE, stdin)){
@@ -39,13 +42,21 @@ int main(int argc, char **argv)
 				head.dataLen = n;
 				
 				//send head
-				conn.SendData(&head,sizeof(head));
+				if(conn.SendData(&head,sizeof(head))== false){
+					cout << conn.GetLastError() << endl;
+					return -1;
+				}
 				//recv head
-				conn.SendData(msgStr, n);
-				
+				if(conn.SendData(msgStr, n) == false){
+					cout << conn.GetLastError() << endl;
+					return -1;
+				}
 				//receive data
-			        conn.RecvData(msgStr, n);
-			        msgStr[n] = 0;
+			        if(conn.RecvData(msgStr, n) == false){
+					cout  << conn.GetLastError();
+					return -1;
+			        }
+				msgStr[n] = 0;
 
 			        cout << "Received msg: " << msgStr << endl;
 			}
@@ -53,4 +64,6 @@ int main(int argc, char **argv)
 	}catch(const ConnectionException &e){
 		cout << e.what();
 	}
+	
+	return 0;
 }

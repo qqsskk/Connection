@@ -23,19 +23,30 @@ int main()
 		connListen.BindIpPort(NULL, LISTEN_PORT);
 		connListen.ListenForClient(LISTEN_QUEUE);
 		cout << "Listen ...\n";
-		while(connListen.AcceptClient(connCli)){
-			cout <<"Client " <<  connCli.GetIP() << " on port " << connCli.GetPort() << " is connected to fd " << connCli.GetSockfd() << endl;
-	        break;
+		while(connListen.AcceptClient(connCli) ==false){
+			cout << connListen.GetLastError() << endl;
 		}
+		cout <<"Client " <<  connCli.GetIP() << " on port " << connCli.GetPort() 
+			<< " is connected to fd " << connCli.GetSockfd() << endl;
 
 		while(1){
-			connCli.RecvData(&head,sizeof(head));
-			connCli.RecvData(msgStr, head.dataLen);
+			if(connCli.RecvData(&head,sizeof(head)) == false){
+				cout << connCli.GetLastError() << endl;
+				return -1;
+			}
+			if(connCli.RecvData(msgStr, head.dataLen)==false){
+				cout << connCli.GetLastError() << endl;
+				return -1;
+			}
 			msgStr[head.dataLen]=0;
-			connCli.SendData(msgStr, head.dataLen);
+			if(connCli.SendData(msgStr, head.dataLen) == false){
+				cout << connCli.GetLastError() << endl;
+				return -1;
+			}
 			cout << "Received "<< msgStr << "\nEcho back ...\n";
 		}
 	}catch(const ConnectionException &e){
 		cout << e.what();
 	}
+	return 0;
 }
