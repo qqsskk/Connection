@@ -7,5 +7,6 @@ COMPILE_FILES:= ConnectionException.cpp \
 				ConnectionIPV4.cpp \
 				ConcurrentServer.cpp \
 				SelectServer.cpp \
-				PollServer.cpp
+				PollServer.cpp \
+				EPollServer.cpp 
 include ../Makefile-so
