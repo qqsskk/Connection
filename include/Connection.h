@@ -29,6 +29,7 @@ public:
 	int 			GetPort(void);
 	int 			GetSockfd(void);
 	const char *	GetLastError(void);
+	void			SetAddrReuseable(void) throw(ConnectionException&);
 	//server&client use
 	void 			InitialSocket(void) throw(ConnectionException&);
 	void 			Close(void) throw(ConnectionException&);

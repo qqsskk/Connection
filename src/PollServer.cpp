@@ -1,12 +1,15 @@
 #include "PollServer.h"
 
+//----------------------------------------------------------------
 PollServer::PollServer()
 {
 }
+//----------------------------------------------------------------
 PollServer::~PollServer()
 {
 	EndService();
 }
+//----------------------------------------------------------------
 void PollServer::StartService(const char *ipStr, int port, int queueMax) throw(ConnectionException&)
 {
 	ConcurrentServer::StartService(ipStr,port,queueMax);
@@ -16,6 +19,7 @@ void PollServer::StartService(const char *ipStr, int port, int queueMax) throw(C
 	listenPollfd.events = POLLRDNORM;
 	mPollVec.push_back(listenPollfd);
 }
+//----------------------------------------------------------------
 void PollServer::EndService() throw(ConnectionException&)
 {
 	if(mInService){
@@ -25,7 +29,7 @@ void PollServer::EndService() throw(ConnectionException&)
 	}
 	ConcurrentServer::EndService();
 }
-
+//----------------------------------------------------------------
 void PollServer::AddNewClient(ConnectionIPV4 &clientConn)
 {
 	struct pollfd pollfd;
@@ -35,6 +39,7 @@ void PollServer::AddNewClient(ConnectionIPV4 &clientConn)
 	
 	ConcurrentServer::AddNewClient(clientConn);
 }
+//----------------------------------------------------------------
 void PollServer::RemoveClient(ConnectionIPV4 &clientConn)
 {
 	for(PollClientVectorIter iter = mPollVec.begin() + 1; iter !=mPollVec.end(); ++iter){
@@ -45,6 +50,7 @@ void PollServer::RemoveClient(ConnectionIPV4 &clientConn)
 	}
 	ConcurrentServer::RemoveClient(clientConn);
 }
+//----------------------------------------------------------------
 bool PollServer::WaitForClient(ClientVector &waitClientVec) throw(ConnectionException&)
 {
 	int nReady,n;

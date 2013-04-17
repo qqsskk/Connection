@@ -2,9 +2,11 @@
 #include <sys/select.h>
 #include <stdio.h>
 
+//----------------------------------------------------------------
 SelectServer::SelectServer()
 {
 }
+//----------------------------------------------------------------
 SelectServer::~SelectServer()
 {
 	try{
@@ -13,6 +15,7 @@ SelectServer::~SelectServer()
 		fprintf(stderr, "Exception occurs when endding service, description %s\n", e.what());
 	}
 }
+//----------------------------------------------------------------
 void SelectServer::StartService(const char *ipStr, int port, int queueMax) throw(ConnectionException&)
 {
 	ConcurrentServer::StartService(ipStr,port,queueMax);
@@ -20,6 +23,7 @@ void SelectServer::StartService(const char *ipStr, int port, int queueMax) throw
 	FD_ZERO(&mInitSet);
 	FD_SET(mMaxSockfd, &mInitSet);
 }
+//----------------------------------------------------------------
 void SelectServer::EndService() throw(ConnectionException&)
 {
 	if(mInService){
@@ -29,6 +33,7 @@ void SelectServer::EndService() throw(ConnectionException&)
 	}
 	ConcurrentServer::EndService();
 }
+//----------------------------------------------------------------
 void SelectServer::AddNewClient(ConnectionIPV4& clientConn)
 {	
 	ConcurrentServer::AddNewClient(clientConn);
@@ -43,6 +48,7 @@ void SelectServer::AddNewClient(ConnectionIPV4& clientConn)
 		}
 	}
 }
+//----------------------------------------------------------------
 bool SelectServer::WaitForClient(ClientVector& waitClientVec) throw(ConnectionException&)
 {
 	int nReady;

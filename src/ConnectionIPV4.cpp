@@ -45,9 +45,19 @@ int ConnectionIPV4::GetSockfd(void)
 {
 	return mSockfd;
 }
+//----------------------------------------------------------------
 const char *ConnectionIPV4::GetLastError(void)
 {
 	return mLastErrorStr.c_str();
+}
+//----------------------------------------------------------------
+void ConnectionIPV4::SetAddrReuseable(void) throw(ConnectionException&)
+{
+	int on = 1;
+
+	if(setsockopt(mSockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1){
+		throw ConnectionException("Error setsockopt : set reuseaddr failure\n");
+	}
 }
 //----------------------------------------------------------------
 /*

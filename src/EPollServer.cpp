@@ -1,5 +1,6 @@
 #include "EPollServer.h"
 
+//----------------------------------------------------------------
 EPollServer::EPollServer(int maxfds, int maxEvents):
 	mMaxfds(maxfds),
 	mMaxEvents(maxEvents),
@@ -9,10 +10,12 @@ EPollServer::EPollServer(int maxfds, int maxEvents):
 	if(pEvent) mpWaitingEvents = pEvent;
 	//else throw /*异常类需要加入另一个成员，表示内存异常*/
 }
+//----------------------------------------------------------------
 EPollServer::~EPollServer()
 {
 	EndService();
 }
+//----------------------------------------------------------------
 void EPollServer::StartService(const char *ipStr, int port, int queueMax) throw(ConnectionException&)
 {
 	int ret;
@@ -27,6 +30,7 @@ void EPollServer::StartService(const char *ipStr, int port, int queueMax) throw(
 	ret = epoll_ctl(mEpollfd, EPOLL_CTL_ADD, mListenConn.GetSockfd(), &ev);
 	if(ret < 0) throw ConnectionException("Error Add fd to epoll");
 }
+//----------------------------------------------------------------
 void EPollServer::EndService() throw(ConnectionException&)
 {
 	if(mInService){
@@ -37,10 +41,12 @@ void EPollServer::EndService() throw(ConnectionException&)
 	close(mEpollfd);
 	ConcurrentServer::EndService();
 }
+//----------------------------------------------------------------
 void EPollServer::AddNewClient(ConnectionIPV4 &clientConn)
 {
 	mClientMap.insert(ClientMap::value_type(clientConn.GetSockfd(), clientConn));
 }
+//----------------------------------------------------------------
 void EPollServer::RemoveClient(ConnectionIPV4 &clientConn)
 {
 	ClientMapIter iter = mClientMap.find(clientConn.GetSockfd());
@@ -51,6 +57,7 @@ void EPollServer::RemoveClient(ConnectionIPV4 &clientConn)
 	if(epoll_ctl(mEpollfd, EPOLL_CTL_DEL, clientConn.GetSockfd(), &ev) <0)
 		throw ConnectionException("Error delete fd from epoll");
 }
+//----------------------------------------------------------------
 bool EPollServer::WaitForClient(ClientVector &waitClientVec) throw(ConnectionException&)
 {
 	int nReady;
