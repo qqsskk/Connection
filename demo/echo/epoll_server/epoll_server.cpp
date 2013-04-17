@@ -2,6 +2,7 @@
 #include <Protocal.h>
 #include <vector>
 #include <iostream>
+#include <stdio.h>
 using namespace std;
 
 #define LISTEN_PORT 8000

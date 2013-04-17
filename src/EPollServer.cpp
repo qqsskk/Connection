@@ -23,7 +23,7 @@ void EPollServer::StartService(const char *ipStr, int port, int queueMax) throw(
 	if(ret < 0) throw ConnectionException("Error Create epoll fd");
 	struct epoll_event ev;
 	ev.data.fd = mListenConn.GetSockfd();
-	ev.events = EPOLLIN | EPOLLET;
+	ev.events = EPOLLIN;
 	ret = epoll_ctl(mEpollfd, EPOLL_CTL_ADD, mListenConn.GetSockfd(), &ev);
 	if(ret < 0) throw ConnectionException("Error Add fd to epoll");
 }
@@ -57,22 +57,24 @@ bool EPollServer::WaitForClient(ClientVector &waitClientVec) throw(ConnectionExc
 	bool ret = false;
 	struct epoll_event ev;
 	
+	waitClientVec.clear();
 	nReady = epoll_wait(mEpollfd, mpWaitingEvents, mMaxEvents, -1);
 	if(nReady == -1) throw ConnectionException("Epoll wait error");
 
 	for(int i =0; i < nReady; ++i){
 		if(mListenConn.GetSockfd() == mpWaitingEvents[i].data.fd){
 			ConnectionIPV4 cliConn;
-			mListenConn.AcceptClient(cliConn);
-			ev.data.fd = cliConn.GetSockfd();
-			ev.events = EPOLLIN | EPOLLET;
-			epoll_ctl(mEpollfd, EPOLL_CTL_ADD, cliConn.GetSockfd(), &ev);
-			AddNewClient(cliConn);
-			ret = true;
-			waitClientVec.push_back(cliConn);
-			if(waitClientVec.size() > 1)
-				std::swap(waitClientVec[0], waitClientVec[waitClientVec.size() - 1]);
-		}else{
+			if(mListenConn.AcceptClient(cliConn) == true) {
+				ev.data.fd = cliConn.GetSockfd();
+				ev.events = EPOLLIN;
+				epoll_ctl(mEpollfd, EPOLL_CTL_ADD, cliConn.GetSockfd(), &ev);
+				AddNewClient(cliConn);
+				ret = true;
+				waitClientVec.push_back(cliConn);
+				if(waitClientVec.size() > 1)
+					std::swap(waitClientVec[0], waitClientVec[waitClientVec.size() - 1]);
+			}
+		}else if (mpWaitingEvents[i].events &(EPOLLIN | EPOLLERR)){
 			ClientMapIter iter = mClientMap.find(mpWaitingEvents[i].data.fd);
 			if(iter != mClientMap.end()){
 				waitClientVec.push_back(iter->second);
