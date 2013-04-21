@@ -5,7 +5,7 @@
 	> Created Time: 2013年04月06日 星期六 01时00分06秒
  ************************************************************************/
 #include <Connection.h>
-#include <Protocal.h>
+#include "../Protocal.h"
 #include <iostream>
 #include <unistd.h>
 #include <string.h>

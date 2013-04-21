@@ -1,5 +1,5 @@
 #include <PollServer.h>
-#include <Protocal.h>
+#include "../Protocal.h"
 #include <vector>
 #include <iostream>
 using namespace std;
