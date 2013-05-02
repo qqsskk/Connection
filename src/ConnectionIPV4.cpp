@@ -216,3 +216,8 @@ bool ConnectionIPV4::ConnectToServer(const char *serverIpStr, int serverPort)
 	}
 	return true;
 }
+//----------------------------------------------------------------
+bool ConnectionIPV4::operator<(const ConnectionIPV4& rhs) const
+{
+	return mSockfd<rhs.mSockfd;
+}

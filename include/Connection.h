@@ -42,7 +42,8 @@ public:
 
 	bool 			SendData(void *data, int n);
 	bool 			RecvData(void *buffer, int n);
-	
+
+	bool			operator<(const ConnectionIPV4& rhs) const;
 private:
 	struct sockaddr_in mSockAddr;
 	bool mClosed;

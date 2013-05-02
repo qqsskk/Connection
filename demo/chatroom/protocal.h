@@ -16,10 +16,12 @@ struct ReqHead{
 };
 struct ReqLogin{
 	struct ReqHead head;
+	int nameLength;
 	char str[0];/*actual size: head.reqLength-sizeof(head), username & passwd*/
 };
 struct ReqRegister{
-	struct reqHead head;
+	struct ReqHead head;
+	int nameLength;
 	char str[0];
 };
 struct ReqShow{
@@ -38,7 +40,7 @@ enum ReplyNo{
 	REPLY_CHAT
 };
 struct ReplyHead{
-	int replyHead;
+	int replyNo;
 	int replyLength;
 };
 struct ReplyLogin{
@@ -55,6 +57,7 @@ struct UserInfo{
 };
 struct ReplyShow{
 	struct ReplyHead head;
+	int n;
 	struct UserInfo user[0];
 };
 struct ReplyChat{
