@@ -74,17 +74,17 @@ bool ConnectionIPV4::SendData(void *data, int n)
 	    if(sendBytes <= 0){
 	        if(EINTR == errno || EAGAIN == errno) sendBytes = 0;/*continue send*/
 	        else if(EPIPE == errno){
-			mLastErrorStr = "Error send data : send data to client which has send RST to server";
-			return false;
+				mLastErrorStr = "Error send data : send data to client which has send RST to server";
+				return false;
 	        }else if(ECONNRESET == errno){
 	        	mLastErrorStr = "Error send data : connnection has been reseted";
-			return false;
+				return false;
 	        }else if(ECONNREFUSED == errno){
 	        	mLastErrorStr = "Errno send date: counterpart restarted";
-			return false;
+				return false;
 	        }else{
 	        	mLastErrorStr = "Error send data: unknown reason";
-			return false;
+				return false;
 	        }
 	    }
 	    sendNum += sendBytes;
@@ -100,8 +100,8 @@ bool ConnectionIPV4::RecvData(void *data, int n)
 	while(n-recvNum > 0){
 	    recvBytes = read(mSockfd, buffer+recvNum, n-recvNum);
 	    if(0 == recvBytes){
-		mLastErrorStr = "Error recv data: received FIN from counterpart";
-		return false;
+			mLastErrorStr = "Error recv data: received FIN from counterpart";
+			return false;
 	    }else if(recvBytes < 0){
 	        if(EINTR == errno || EAGAIN == errno) recvBytes = 0;/*continue receive data*/
 		else if(ETIMEDOUT == errno){
@@ -202,7 +202,8 @@ bool ConnectionIPV4::ConnectToServer(const char *serverIpStr, int serverPort)
 			return false;
 		}else if(ECONNREFUSED == errno){
 			mLastErrorStr = "Error connect: server is not ready, please wait and try again";
-			return false;/*return false to let user reconnect*/
+			return false;/*return false to let user reconnect*/
+
 		}else if(ETIMEDOUT == errno){
 			mLastErrorStr = "Error connect: connection time out, server busy, please wait and try again";
 			return false;
